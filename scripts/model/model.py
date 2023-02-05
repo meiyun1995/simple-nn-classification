@@ -1,5 +1,6 @@
 from ast import Tuple
 import os
+from utils.logging import LOG
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -9,6 +10,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation,Dropout
 from tensorflow.keras.optimizers import Adam, SGD
 from tensorflow.keras.models import load_model
+from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.metrics import classification_report, confusion_matrix
 
 from scripts.data.data_pipeline import load_data, data_preprocessing
@@ -18,7 +20,7 @@ class Model:
         self.data = df
         
     def train_test_split(self):
-        """Split the data into train and test set and return a tuple of pandas dataframe.
+        """Split the data intol train and test set and return a tuple of pandas dataframe.
 
         Args:
             df (pd.DataFrame): cleaned data
@@ -75,16 +77,23 @@ class Model:
         """
         self.X_train, self.X_test, self.y_train, self.y_test = self.normalized_data()
 
+        LOG.info('Checking if model exists...')
         if check_model_exists and os.path.exists('scripts/model/nn_model.h5'):
+            LOG.info('Model found! Loading trained model...')
             model = load_model('scripts/model/nn_model.h5')
         else:
+            LOG.info('Model not found! Training model...')
             model = self.build_model()
+            early_stop = EarlyStopping(monitor='val_loss', mode='min', verbose=1, patience=25)
             model.fit(x=self.X_train, y=self.y_train,
                         epochs=80, validation_data=(self.X_test, self.y_test),
-                        batch_size=28, verbose=1)
+                        batch_size=28, callbacks=[early_stop],
+                        verbose=1)
 
+            LOG.info('Saving model...')
             model.save('scripts/model/nn_model.h5')
 
+        LOG.info('Making predictions...')
         predict_x = model.predict(self.X_test) 
         predictions = (predict_x > 0.5).astype("int32")
 
