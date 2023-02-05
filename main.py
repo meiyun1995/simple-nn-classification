@@ -1,7 +1,4 @@
-import sys
-
-sys.path.append('../')
-from scripts.model import Model
+from scripts.model.model import Model
 from scripts.data.data_pipeline import load_data, data_preprocessing
 
 if __name__ == '__main__':

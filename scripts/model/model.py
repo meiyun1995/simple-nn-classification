@@ -17,7 +17,7 @@ class Model:
     def __init__(self, df: pd.DataFrame):
         self.data = df
         
-    def train_test_split(self) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def train_test_split(self):
         """Split the data into train and test set and return a tuple of pandas dataframe.
 
         Args:
@@ -32,7 +32,7 @@ class Model:
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, random_state=101)
         return X_train, X_test, y_train, y_test
         
-    def normalized_data(self) -> Tuple[np.ndarray, np.ndarray]:
+    def normalized_data(self):
         """Normalize the data and return a tuple of numpy array.
 
         Args:
@@ -48,7 +48,7 @@ class Model:
         X_test = scaler.transform(X_test)
         return X_train, X_test, y_train, y_test
     
-    def build_model(self) -> tf.keras.Sequential:
+    def build_model(self):
         """Build a model and return a keras sequential model.
 
 
@@ -73,10 +73,11 @@ class Model:
             model (tf.keras.Sequential): keras sequential model
             predictions (np.ndarray): numpy array
         """
+        self.X_train, self.X_test, self.y_train, self.y_test = self.normalized_data()
+
         if check_model_exists and os.path.exists('scripts/model/nn_model.h5'):
             model = load_model('scripts/model/nn_model.h5')
         else:
-            self.X_train, self.X_test, self.y_train, self.y_test = self.normalized_data()
             model = self.build_model()
             model.fit(x=self.X_train, y=self.y_train,
                         epochs=80, validation_data=(self.X_test, self.y_test),
@@ -98,4 +99,4 @@ class Model:
         Returns:
             None
         """
-        print(f'{(classification_report(self.y_test, predictions))} \n{(confusion_matrix(self.y_test, predictions))}')
+        print(f'Classification report: \n{(classification_report(self.y_test, predictions))} \nConfusion Matrix: \n{(confusion_matrix(self.y_test, predictions))}')
