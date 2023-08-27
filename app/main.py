@@ -51,7 +51,7 @@ def home():
 @app.post("/predict", response_description='The predicted result of the cancellation rate in hotel')
 def predict(reservation: Reservation):
     df = pd.DataFrame(jsonable_encoder([reservation]))
-    cleaned_df = data_preprocessing(df)
+    cleaned_df = data_preprocessing(df, infer=True)
     predict_x = model.predict(cleaned_df) 
     predictions = (predict_x > 0.5).astype("int32")
     pred = predictions[0]
