@@ -33,7 +33,8 @@ def data_preprocessing(df: pd.DataFrame, infer: bool = False) -> pd.DataFrame:
     df_cleaned = pd.concat([df_drop, type_of_meal, room_type, market_segment], axis=1)
 
     # Map booking status to 0 and 1
-    df_cleaned.booking_status = df_cleaned.booking_status.map({'Canceled': 1, 'Not_Canceled': 0})
+    if not infer:
+        df_cleaned.booking_status = df_cleaned.booking_status.map({'Canceled': 1, 'Not_Canceled': 0})
 
     # Map arrival year to 0 and 1
     df_cleaned.arrival_year = df_cleaned.arrival_year.map({2017: 0, 2018: 1})
