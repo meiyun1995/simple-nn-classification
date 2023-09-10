@@ -5,12 +5,11 @@ from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from tensorflow.keras.models import load_model
 from pydantic import BaseModel
-import nest_asyncio
 import json
 import os
 import sys
 import uvicorn
-sys.path.append('/Users/chuameiyun/Documents/2023 AI Projects/ML project/scripts/data/') #
+sys.path.append('./app')
 from data_pipeline import data_preprocessing
 
 
@@ -41,7 +40,7 @@ class Reservation(BaseModel):
 @app.on_event("startup")
 def load_nn_model():
     global model
-    model = load_model('nn_model.h5')
+    model = load_model('./app/nn_model.h5')
 
 
 @app.get("/")
@@ -74,7 +73,7 @@ def predict(reservation: Reservation):
 
     df = pd.DataFrame([data])
     cleaned_df = data_preprocessing(df, infer=True)
-    with open('scaler', 'rb') as f:
+    with open('./app/scaler', 'rb') as f:
         scaler = pickle.load(f)
     scaled_df = scaler.transform(cleaned_df)
     predict_x = model.predict(scaled_df) 

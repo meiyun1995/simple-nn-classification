@@ -54,7 +54,7 @@ def get_encoded_data(df: pd.DataFrame, column_name: str, infer: bool = False) ->
         pd.DataFrame: encoded data
     """
     if infer:
-        with open(f"encoder_{column_name}", 'rb') as f:
+        with open(f"./app/encoder_{column_name}", 'rb') as f:
             enc = pickle.load(f) 
     else:
     # Get encoded data
